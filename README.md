@@ -370,7 +370,6 @@ Pada metode stacking ini, tiga model dijadikan base learners:
 Ketiga model tersebut menghasilkan prediksi masing-masing, kemudian digabungkan dan digunakan sebagai input bagi **final estimator**, yaitu Logistic Regression, untuk menghasilkan keputusan akhir. Selain itu, proses pelatihan menggunakan **Stratified K-Fold** untuk menjaga keseimbangan kelas di setiap fold dan menghindari overfitting.
 
 <img width="608" height="252" alt="image" src="https://github.com/user-attachments/assets/25bb59a9-96ca-450a-8caf-44cd1d6d7a38" />
-- Meta Model (Final Estimator: Logistic Regression)
   
 Pendekatan ini memungkinkan model untuk saling melengkapi:
 - Logistic Regression menangkap pola linear
