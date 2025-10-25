@@ -156,3 +156,37 @@ Dalam tahap awal pembersihan data, dilakukan pengecekan terhadap duplikasi data 
 | `YearsSinceLastPromotion` | 0                      |
 | `YearsWithCurrManager`    | 0                      |
 | `Attrition`               | 0                      |
+
+### Menangani Outliers
+Deteksi outlier dilakukan menggunakan metode Interquartile Range (IQR) untuk semua fitur numerik. Hasil analisis menunjukkan bahwa beberapa fitur memiliki jumlah outlier yang cukup signifikan, seperti MonthlyIncome (86 outlier), NumCompaniesWorked (36 outlier), PerformanceRating (185 outlier), StockOptionLevel (66 outlier), TotalWorkingYears (52 outlier), TrainingTimesLastYear (174 outlier), YearsAtCompany (52 outlier), YearsInCurrentRole (16 outlier), YearsSinceLastPromotion (85 outlier), dan YearsWithCurrManager (10 outlier). Keberadaan outlier pada fitur-fitur tersebut mengindikasikan adanya variasi ekstrem dalam karakteristik karyawan, misalnya dalam hal pendapatan, pengalaman kerja, atau frekuensi promosi dan pelatihan.
+| Fitur                     | Jumlah Outlier   |
+|---------------------------|------------------|
+| `Age`                     | 0                |
+| `DailyRate`               | 0                |
+| `DistanceFromHome`        | 0                |
+| `Education`               | 0                |
+| `EmployeeCount`           | 0                |
+| `EmployeeNumber`          | 0                |
+| `EnvironmentSatisfaction` | 0                |
+| `HourlyRate`              | 0                |
+| `JobInvolvement`          | 0                |
+| `JobLevel`                | 0                |
+| `JobSatisfaction`         | 0                |
+| `MonthlyIncome`           | 86               |
+| `MonthlyRate`             | 0                |
+| `NumCompaniesWorked`      | 36               |
+| `PercentSalaryHike`       | 0                |
+| `PerformanceRating`       | 185              |
+| `RelationshipSatisfaction`| 0                |
+| `StandardHours`           | 0                |
+| `StockOptionLevel`        | 66               |
+| `TotalWorkingYears`       | 52               |
+| `TrainingTimesLastYear`   | 174              |
+| `WorkLifeBalance`         | 0                |       
+| `YearsAtCompany`          | 52               |
+| `YearsInCurrentRole`      | 16               |
+| `YearsSinceLastPromotion` | 85               |
+| `YearsWithCurrManager`    | 10               |
+
+<img width="1489" height="4490" alt="image" src="https://github.com/user-attachments/assets/11ddb227-4e44-4a83-b0f5-a760ff4a1614" />
+Outlier ini tidak dihapus agar informasi penting mengenai variasi karakteristik karyawan tetap terjaga, yang dapat berpengaruh pada analisis risiko attrition.
