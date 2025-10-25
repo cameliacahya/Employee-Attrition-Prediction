@@ -311,6 +311,47 @@ Kelima model ini digunakan dengan pengaturan parameter awal sebagai percobaan da
 
 - Pada langkah ini, membandingkan kinerja model yang berbeda dengan menggunakan **_stratified k-fold cross validation_** untuk melatih masing-masing model dan mengevaluasi skor ROC-AUC. Stratified k-fold cross validation akan mempertahankan proporsi target pada setiap fold, menangani target yang tidak seimbang.
 
-- _k-fold cross validation_ adalah teknik yang digunakan dalam _machine learning_ untuk menilai kinerja model. Teknik ini melibatkan pembagian dataset menjadi K subset, menggunakan K-1 untuk pelatihan dan satu untuk pengujian secara berulang. Hal ini membantu dalam memperkirakan kemampuan generalisasi model dengan mengurangi risiko _overfitting_ dan memberikan metrik kinerja yang lebih andal.
+### 2. Model Comparison
+Evaluasi performa model dilakukan menggunakan **K-Fold Cross Validation** dengan metrik **ROC-AUC**, sehingga skor yang ditampilkan merupakan **rata-rata performa generalisasi model** pada berbagai subset data. Berdasarkan hasil pengujian pada tabel, **Logistic Regression** memperoleh nilai ROC-AUC tertinggi sebesar **0.8241**, disusul oleh **SVC** dengan skor **0.8218**. Model berbasis tree boosting seperti **XGBClassifier (0.7965)** dan **LGBMClassifier (0.7978)** menunjukkan performa yang cukup baik, namun masih berada di bawah model linear dan kernel-based. Sementara itu, Random Forest memiliki performa paling rendah (0.7862), yang mengindikasikan bahwa model ini kurang mampu menangkap pola secara optimal dalam dataset ini.
+| Model                 | ROC-AUC Score |
+|-----------------------|---------------|
+| LogisticRegression    | 0.8241        |
+| RandomForest          | 0.7862        |
+| XGBClassifier         | 0.7965        |
+| LGBMClassifier        | 0.7978        |
+| SVC                   | 0.8218        |
+Model **Logistic Regression** dan **SVC** ini menunjukkan kemampuan paling baik dalam membedakan kelas Attrition, terutama mengingat kondisi dataset yang mengalami ketidakseimbangan kelas. Sehingga, kedua model ini kemudian dilanjutkan ke tahap Hyperparameter Tuning untuk meningkatkan performa prediksi secara lebih optimal.
 
-- Tujuan tahap ini adalah untuk memilih model terbaik untuk digunakan dalam _hyperparameter tuning_ dan evaluasi model akhir. Untuk mendapatkan model terbaik ini, akan dievaluasi skor validasi rata-rata **roc-auc** tertinggi dan melihat trade-off bias-varians.
+### 3. Hyperparameter Tuning
+Tahap selanjutnya adalah melakukan optimasi hiperparameter untuk meningkatkan performa model terbaik. Dua model yang dipilih berdasarkan hasil K-Fold ROC-AUC sebelumnya, yaitu **Logistic Regression** dan **Support Vector Classifier (SVC)**, dilakukan proses tuning menggunakan **GridSearchCV** dengan skema **Stratified K-Fold (k = 5)**. Pendekatan ini memastikan distribusi kelas tetap seimbang pada setiap fold, sehingga evaluasi performa lebih stabil dan tidak bias terhadap kelas mayoritas.
+
+Proses tuning dilakukan dalam satu pipeline yang mencakup preprocessing data (scaling dan encoding) untuk mencegah kebocoran data (data leakage) antara train dan validation split pada CV.
+#### - Logistic Regression
+Parameter yang dioptimasi:
+| Parameter | Pilihan                          | Tujuan                                                  |
+| --------- | -------------------------------- | ------------------------------------------------------- |
+| `penalty` | `['l1', 'l2']`                   | Memilih jenis regularisasi agar model tidak overfitting |
+| `C`       | `[0.001, 0.01, 0.1, 1, 10, 100]` | Mengatur strength regularisasi                          |
+| `solver`  | `['liblinear', 'lbfgs']`         | Menyesuaikan solver yang kompatibel dgn penalty         |
+Selain itu, digunakan class_weight = ‘balanced’ untuk mengatasi ketidakseimbangan kelas pada target attrition.
+
+Setelah proses pencarian kombinasi terbaik, diperoleh hasil berupa:
+- **Best AUC Score :** 0.8280
+- **Best Parameters :** {'model__C': 0.1, 'model__penalty': 'l2', 'model__solver': 'liblinear'}
+
+#### - Support Vector Classifier (SVC)
+Parameter yang dioptimasi:
+| Parameter | Pilihan                     | Tujuan                                                 |
+| --------- | --------------------------- | ------------------------------------------------------ |
+| `C`       | `[0.1, 1, 10, 100]`         | Mengontrol margin dan penalti kesalahan                |
+| `kernel`  | `['linear', 'rbf', 'poly']` | Menangkap pola linear maupun non-linear                |
+| `gamma`   | `['scale', 'auto', 0.1, 1]` | Mengatur kompleksitas boundary (untuk kernel RBF/Poly) |
+| `degree`  | `[2, 3, 4]`                 | Khusus kernel polynomial untuk kontrol derajat polinom |
+Penggunaan class_weight = ‘balanced’ juga diterapkan agar prediksi tidak bias terhadap kelas mayoritas.
+
+Setelah proses pencarian selesai, diperoleh:
+- **Best AUC Score :** 0.8306
+- **Best Parameters :** {'model__C': 1, 'model__degree': 2, 'model__gamma': 'auto', 'model__kernel': 'rbf'}
+
+#### Kesimpulan Tuning
+Dengan menerapkan GridSearchCV pada kedua model, diperoleh konfigurasi hiperparameter terbaik yang memberikan performa ROC-AUC maksimal pada data pelatihan ter-validasi. Model terbaik dari tahap ini kemudian akan digunakan pada proses evaluasi akhir terhadap validation/test set untuk memastikan performanya benar-benar generalizable.
