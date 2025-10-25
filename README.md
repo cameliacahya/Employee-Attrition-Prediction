@@ -320,26 +320,28 @@ Evaluasi performa model dilakukan menggunakan **K-Fold Cross Validation** dengan
 | XGBClassifier         | 0.7965        |
 | LGBMClassifier        | 0.7978        |
 | SVC                   | 0.8218        |
+
 Model **Logistic Regression** dan **SVC** ini menunjukkan kemampuan paling baik dalam membedakan kelas Attrition, terutama mengingat kondisi dataset yang mengalami ketidakseimbangan kelas. Sehingga, kedua model ini kemudian dilanjutkan ke tahap Hyperparameter Tuning untuk meningkatkan performa prediksi secara lebih optimal.
 
 ### 3. Hyperparameter Tuning
 Tahap selanjutnya adalah melakukan optimasi hiperparameter untuk meningkatkan performa model terbaik. Dua model yang dipilih berdasarkan hasil K-Fold ROC-AUC sebelumnya, yaitu **Logistic Regression** dan **Support Vector Classifier (SVC)**, dilakukan proses tuning menggunakan **GridSearchCV** dengan skema **Stratified K-Fold (k = 5)**. Pendekatan ini memastikan distribusi kelas tetap seimbang pada setiap fold, sehingga evaluasi performa lebih stabil dan tidak bias terhadap kelas mayoritas.
 
 Proses tuning dilakukan dalam satu pipeline yang mencakup preprocessing data (scaling dan encoding) untuk mencegah kebocoran data (data leakage) antara train dan validation split pada CV.
-#### - Logistic Regression
+#### Logistic Regression
 Parameter yang dioptimasi:
 | Parameter | Pilihan                          | Tujuan                                                  |
 | --------- | -------------------------------- | ------------------------------------------------------- |
 | `penalty` | `['l1', 'l2']`                   | Memilih jenis regularisasi agar model tidak overfitting |
 | `C`       | `[0.001, 0.01, 0.1, 1, 10, 100]` | Mengatur strength regularisasi                          |
 | `solver`  | `['liblinear', 'lbfgs']`         | Menyesuaikan solver yang kompatibel dgn penalty         |
+
 Selain itu, digunakan class_weight = ‘balanced’ untuk mengatasi ketidakseimbangan kelas pada target attrition.
 
 Setelah proses pencarian kombinasi terbaik, diperoleh hasil berupa:
 - **Best AUC Score :** 0.8280
 - **Best Parameters :** {'model__C': 0.1, 'model__penalty': 'l2', 'model__solver': 'liblinear'}
 
-#### - Support Vector Classifier (SVC)
+#### Support Vector Classifier (SVC)
 Parameter yang dioptimasi:
 | Parameter | Pilihan                     | Tujuan                                                 |
 | --------- | --------------------------- | ------------------------------------------------------ |
@@ -347,6 +349,7 @@ Parameter yang dioptimasi:
 | `kernel`  | `['linear', 'rbf', 'poly']` | Menangkap pola linear maupun non-linear                |
 | `gamma`   | `['scale', 'auto', 0.1, 1]` | Mengatur kompleksitas boundary (untuk kernel RBF/Poly) |
 | `degree`  | `[2, 3, 4]`                 | Khusus kernel polynomial untuk kontrol derajat polinom |
+
 Penggunaan class_weight = ‘balanced’ juga diterapkan agar prediksi tidak bias terhadap kelas mayoritas.
 
 Setelah proses pencarian selesai, diperoleh:
@@ -355,3 +358,20 @@ Setelah proses pencarian selesai, diperoleh:
 
 #### Kesimpulan Tuning
 Dengan menerapkan GridSearchCV pada kedua model, diperoleh konfigurasi hiperparameter terbaik yang memberikan performa ROC-AUC maksimal pada data pelatihan ter-validasi. Model terbaik dari tahap ini kemudian akan digunakan pada proses evaluasi akhir terhadap validation/test set untuk memastikan performanya benar-benar generalizable.
+
+### 4. Model Selection
+Berdasarkan hasil hyperparameter tuning, model Logistic Regression dan SVC terpilih sebagai model terbaik. Untuk meningkatkan performa lebih lanjut, dilakukan pendekatan **Stacking Ensemble**, yaitu teknik yang menggabungkan beberapa model sehingga prediksi akhir menjadi lebih kuat dan stabil dibandingkan model tunggal.
+
+Pada metode stacking ini, tiga model dijadikan base learners:
+- Logistic Regression 
+- SVC 
+- Gradient Boosting Classifier (sebagai model tambahan berbasis boosting)
+
+Ketiga model tersebut menghasilkan prediksi masing-masing, kemudian digabungkan dan digunakan sebagai input bagi **final estimator**, yaitu Logistic Regression, untuk menghasilkan keputusan akhir. Selain itu, proses pelatihan menggunakan **Stratified K-Fold** untuk menjaga keseimbangan kelas di setiap fold dan menghindari overfitting.
+
+<img width="608" height="252" alt="image" src="https://github.com/user-attachments/assets/25bb59a9-96ca-450a-8caf-44cd1d6d7a38" />
+- Meta Model (Final Estimator: Logistic Regression)
+  
+Pendekatan ini memungkinkan model untuk saling melengkapi:
+- Logistic Regression menangkap pola linear
+- SVC dan Gradient Boosting mempelajari pola non-linear dan interaksi fitur
