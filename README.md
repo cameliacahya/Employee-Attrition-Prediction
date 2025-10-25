@@ -229,5 +229,88 @@ Proses pembagian dataset dilakukan menggunakan metode train-test split dengan pr
 **Fitur numerik** diproses melalui **Standardization** menggunakan `StandardScaler` agar seluruh variabel memiliki skala yang sebanding dan tidak mempengaruhi bobot model secara tidak proporsional. Sementara itu, **fitur kategorik** dikodekan menggunakan `One-Hot Encoding` dengan handle_unknown='ignore' untuk mengantisipasi kemunculan kategori baru pada data pengujian tanpa menimbulkan error saat proses prediksi. 
 
 Seluruh proses transformasi ini diintegrasikan dalam sebuah ColumnTransformer sehingga baik scaling maupun encoding dapat diterapkan secara otomatis dan konsisten pada pipeline pemodelan yang digunakan pada tahap analisis berikutnya.
+```python
+num_transform = Pipeline(steps=[
+    ('scaler', StandardScaler())
+])
 
+cat_transform = Pipeline(steps=[
+    ('onehot', OneHotEncoder(handle_unknown='ignore'))
+])
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', num_transform, num_col),
+        ('cat', cat_transform, cat_col)
+    ]
+)
+```
 ## Model Training, Selection, and Tuning
+### 1. Model Training
+Pada tahap pengembangan model, digunakan lima algoritma klasifikasi berbasis **linear, tree-based,** dan **ensemble/boosting**. Model yang digunakan meliputi **Logistic Regression (LR), Random Forest (RF), Extreme Gradient Boosting (XGB), LightGBM (LGBM),** dan **Support Vector Classifier (SVC).** Pemilihan kelima model ini didasarkan pada keberagaman kemampuan dalam menangani data kategorik maupun numerik hasil preprocessing One-Hot Encoding, serta untuk membandingkan pendekatan _linear vs tree-based vs boosting_ pada permasalahan prediksi attrition.
+
+#### Logistic Regression (LR)
+```python
+from sklearn.linear_model import LogisticRegression
+
+logreg_model = LogisticRegression(max_iter=1000, random_state=42)
+logreg_model.fit(X_train, y_train)
+```
+[Logistic Regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) merupakan model linear yang banyak digunakan sebagai baseline dalam klasifikasi biner, termasuk prediksi attrition. Model ini menghitung probabilitas keanggotaan kelas menggunakan fungsi logit serta memberikan interpretasi yang baik melalui odds ratio pada setiap fitur prediktor.
+
+#### Random Forest (RF)
+```python
+from sklearn.ensemble import RandomForestClassifier
+
+rf_model = RandomForestClassifier(random_state=42)
+rf_model.fit(X_train, y_train)
+```
+[Random Forest](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) adalah metode bagging ensemble yang menggabungkan beberapa pohon keputusan untuk memperbaiki stabilitas dan akurasi prediksi. Dengan melakukan random sampling terhadap data dan fitur, model ini mampu mengurangi overfitting serta bekerja baik pada hubungan non-linear antar fitur.
+
+#### Extreme Gradient Boosting (XGB)
+```python
+from xgboost import XGBClassifier
+
+xgb_model = XGBClassifier(
+    use_label_encoder=False,
+    eval_metric='logloss',
+    random_state=42
+)
+xgb_model.fit(X_train, y_train)
+```
+XGBClassifier merupakan algoritma boosting berbasis gradien yang mengoptimalkan model secara bertahap. Model ini terkenal efisien dalam menangkap pola kompleks dan interaksi antar fitur, sehingga sering digunakan pada kompetisi data science karena akurasinya yang tinggi.
+
+#### Light Gradient Boosting Machine (LGBM)
+```python
+from lightgbm import LGBMClassifier
+
+lgbm_model = LGBMClassifier(random_state=42, verbose=-1)
+lgbm_model.fit(X_train, y_train)
+```
+LightGBM adalah algoritma boosting yang melakukan pembentukan pohon secara leaf-wise. Keunggulannya terletak pada kecepatan pelatihan, efisiensi memori, serta kemampuan menangani dataset besar dan fitur kategori dalam jumlah banyak.
+
+#### Support Vector Classifier (SVC)
+```python
+from sklearn.svm import SVC
+
+svc_model = SVC(probability=True, random_state=42)
+svc_model.fit(X_train, y_train)
+```
+[Support Vector Classifier](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) berusaha mencari optimal hyperplane yang memisahkan dua kelas dengan margin terbesar. SVC cocok untuk dataset dengan batas pemisahan yang kompleks, serta dapat bekerja baik melalui penggunaan kernel non-linear.
+
+#### Gradient Boosting
+```python
+from sklearn.ensemble import GradientBoostingClassifier
+
+gb_model = GradientBoostingClassifier(random_state=42)
+gb_model.fit(X_train, y_train)
+```
+[Gradient Boosting Classifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html) merupakan metode boosting yang membangun model secara bertahap dengan meminimalkan kesalahan prediksi menggunakan gradient descent. Model ini efektif dalam menangani hubungan non-linear antar fitur dan mampu memberikan performa prediksi yang baik, meskipun membutuhkan waktu pelatihan lebih lama dibandingkan Random Forest karena sifat pembelajaran yang sekuensial.
+
+Kelima model ini digunakan dengan pengaturan parameter awal sebagai percobaan dasar
+
+- Pada langkah ini, membandingkan kinerja model yang berbeda dengan menggunakan **_stratified k-fold cross validation_** untuk melatih masing-masing model dan mengevaluasi skor ROC-AUC. Stratified k-fold cross validation akan mempertahankan proporsi target pada setiap fold, menangani target yang tidak seimbang.
+
+- _k-fold cross validation_ adalah teknik yang digunakan dalam _machine learning_ untuk menilai kinerja model. Teknik ini melibatkan pembagian dataset menjadi K subset, menggunakan K-1 untuk pelatihan dan satu untuk pengujian secara berulang. Hal ini membantu dalam memperkirakan kemampuan generalisasi model dengan mengurangi risiko _overfitting_ dan memberikan metrik kinerja yang lebih andal.
+
+- Tujuan tahap ini adalah untuk memilih model terbaik untuk digunakan dalam _hyperparameter tuning_ dan evaluasi model akhir. Untuk mendapatkan model terbaik ini, akan dievaluasi skor validasi rata-rata **roc-auc** tertinggi dan melihat trade-off bias-varians.
