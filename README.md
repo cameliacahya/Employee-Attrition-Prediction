@@ -158,7 +158,7 @@ Dalam tahap awal pembersihan data, dilakukan pengecekan terhadap duplikasi data 
 | `Attrition`               | 0                      |
 
 ### Menangani Outliers
-Deteksi outlier dilakukan menggunakan metode Interquartile Range (IQR) untuk semua fitur numerik. Hasil analisis menunjukkan bahwa beberapa fitur memiliki jumlah outlier yang cukup signifikan, seperti MonthlyIncome (86 outlier), NumCompaniesWorked (36 outlier), PerformanceRating (185 outlier), StockOptionLevel (66 outlier), TotalWorkingYears (52 outlier), TrainingTimesLastYear (174 outlier), YearsAtCompany (52 outlier), YearsInCurrentRole (16 outlier), YearsSinceLastPromotion (85 outlier), dan YearsWithCurrManager (10 outlier). Keberadaan outlier pada fitur-fitur tersebut mengindikasikan adanya variasi ekstrem dalam karakteristik karyawan, misalnya dalam hal pendapatan, pengalaman kerja, atau frekuensi promosi dan pelatihan.
+Deteksi outlier dilakukan menggunakan metode Interquartile Range (IQR) untuk semua fitur numerik. Hasil analisis menunjukkan bahwa beberapa fitur memiliki jumlah outlier yang cukup signifikan, seperti **MonthlyIncome (86 outlier)**, **NumCompaniesWorked (36 outlier)**, **PerformanceRating (185 outlier)**, **StockOptionLevel (66 outlier)**, **TotalWorkingYears (52 outlier)**, **TrainingTimesLastYear (174 outlier)**, **YearsAtCompany (52 outlier)**, **YearsInCurrentRole (16 outlier)**, **YearsSinceLastPromotion (85 outlier)**, dan **YearsWithCurrManager (10 outlier)**. Keberadaan outlier pada fitur-fitur tersebut mengindikasikan adanya variasi ekstrem dalam karakteristik karyawan, misalnya dalam hal pendapatan, pengalaman kerja, atau frekuensi promosi dan pelatihan.
 | Fitur                     | Jumlah Outlier   |
 |---------------------------|------------------|
 | `Age`                     | 0                |
@@ -190,3 +190,42 @@ Deteksi outlier dilakukan menggunakan metode Interquartile Range (IQR) untuk sem
 
 <img width="1489" height="4490" alt="image" src="https://github.com/user-attachments/assets/11ddb227-4e44-4a83-b0f5-a760ff4a1614" />
 Outlier ini tidak dihapus agar informasi penting mengenai variasi karakteristik karyawan tetap terjaga, yang dapat berpengaruh pada analisis risiko attrition.
+
+### Distribusi Fitur Numerik
+Berdasarkan histogram yang ditampilkan di bawah :
+
+- **Age**: Distribusi usia cenderung sedikit miring ke kanan (positively skewed), menunjukkan bahwa sebagian besar karyawan berusia di bawah 40 tahun, dengan puncaknya berada di sekitar 30-an. Ada juga sejumlah kecil karyawan yang lebih tua, hingga usia 60 tahun.
+- **DailyRate**: Distribusi DailyRate terlihat cukup merata (uniform distribution), meskipun ada sedikit fluktuasi. Ini menunjukkan bahwa DailyRate tersebar relatif proporsional di seluruh rentang nilainya.
+- **DistanceFromHome**: Distribusi DistanceFromHome sangat miring ke kanan. Ini berarti sebagian besar karyawan tinggal cukup dekat dengan tempat kerja (jarak kurang dari 10), sementara ada beberapa karyawan yang tinggal sangat jauh.
+- **MonthlyIncome**: Distribusi MonthlyIncome sangat miring ke kanan. Sebagian besar karyawan memiliki pendapatan bulanan yang relatif rendah, dengan puncaknya berada di bawah 5000. Ada segelintir karyawan dengan pendapatan yang jauh lebih tinggi.
+- **TotalWorkingYears**: Distribusi TotalWorkingYears juga miring ke kanan. Mayoritas karyawan memiliki pengalaman kerja total kurang dari 10 tahun, dengan beberapa karyawan yang memiliki pengalaman kerja yang sangat panjang.
+- **YearsAtCompany**: Distribusi YearsAtCompany sangat miring ke kanan, mirip dengan TotalWorkingYears. Ini menunjukkan bahwa sebagian besar karyawan baru bekerja di perusahaan ini selama beberapa tahun, dengan segelintir yang telah bekerja untuk waktu yang lama.
+
+Secara umum, banyak variabel numerik menunjukkan distribusi yang miring (skewed), terutama miring ke kanan. Ini menunjukkan adanya nilai-nilai ekstrim yang tinggi pada variabel-variabel tersebut (seperti MonthlyIncome, DistanceFromHome, TotalWorkingYears, YearsAtCompany). Informasi ini penting untuk dipahami karena dapat mempengaruhi pilihan model machine learning dan kebutuhan akan feature scaling atau transformasi data.
+<img width="1987" height="1572" alt="image" src="https://github.com/user-attachments/assets/78317d50-66e2-4c08-bbdc-168684faef67" />
+
+### Distribusi Fitur Kategorik
+Berdasarkan plot distribusi di bawah :
+
+- **BusinessTravel**: Mayoritas karyawan (Travel_Rarely) melakukan perjalanan bisnis sesekali, diikuti oleh Travel_Frequently, dan sebagian kecil Non-Travel. Ini menunjukkan bahwa sebagian besar karyawan tidak melakukan perjalanan bisnis secara intensif.
+- **Department**: Departemen Research & Development memiliki jumlah karyawan terbanyak, diikuti oleh Sales, dan paling sedikit adalah Human Resources. Ini mengindikasikan struktur organisasi perusahaan dengan fokus yang lebih besar pada R&D dan Penjualan.
+- **EducationField**: Bidang pendidikan yang paling umum adalah Life Sciences dan Medical, diikuti oleh Marketing dan Technical Degree. Bidang Other dan Human Resources memiliki jumlah yang paling sedikit.
+- **Gender**: Terdapat lebih banyak karyawan Male dibandingkan Female. Ini menunjukkan ketidakseimbangan gender dalam dataset.
+- **JobRole**: Peran pekerjaan (JobRole) yang paling banyak adalah Sales Executive, diikuti oleh Research Scientist, dan Laboratory Technician. Beberapa peran seperti Human Resources dan Sales Representative memiliki jumlah yang paling sedikit.
+- **MaritalStatus**: Status pernikahan yang paling umum adalah Married, diikuti oleh Single, dan paling sedikit adalah Divorced.
+- **OverTime**: Sebagian besar karyawan (No) tidak melakukan kerja lembur, sementara sebagian kecil (Yes) melakukan kerja lembur. Ini menunjukkan bahwa kerja lembur bukanlah praktik yang sangat umum di perusahaan ini, atau setidaknya tidak dicatat untuk mayoritas karyawan.
+
+Secara keseluruhan, kita melihat adanya ketidakseimbangan yang signifikan pada beberapa variabel kategorik seperti Gender dan OverTime. Variabel lain seperti Department, EducationField, dan JobRole memiliki beberapa kategori dominan. Memahami distribusi ini penting untuk langkah preprocessing selanjutnya, seperti encoding variabel kategorik, dan juga untuk mempertimbangkan strategi penanganan ketidakseimbangan data jika target (Attrition) juga tidak seimbang terkait dengan variabel kategorik ini.
+<img width="1790" height="985" alt="image" src="https://github.com/user-attachments/assets/0fae0edf-21e7-4ee3-a39a-b65517633f54" />
+
+## Data Preparation
+### 1. Drop Fitur yang Tidak Digunakan
+ada tahap data preparation, dilakukan proses pembersihan data yang diawali dengan penghapusan fitur yang tidak memberikan kontribusi terhadap analisis maupun pemodelan. Beberapa variabel seperti `id`, `EmployeeCount`, `EmployeeNumber`, `StandardHours`, dan `Over18` dihapus dari kedua dataset (train dan test) karena seluruhnya bersifat konstan atau tidak relevan dalam memprediksi attrition, sehingga keberadaannya berpotensi menambah noise pada model.
+### 2. Splitting Data
+Setelah itu dilakukan pemisahan data menjadi fitur prediktor dan variabel target, di mana variabel `Attrition` ditetapkan sebagai **target**, sedangkan variabel lainnya digunakan sebagai fitur pada dataset training. 
+
+Proses pembagian dataset dilakukan menggunakan metode train-test split dengan proporsi **80% data sebagai data train** dan **20% sebagai data validasi**, serta menerapkan parameter stratify = y untuk menjaga keseimbangan proporsi kelas target pada kedua subset sehingga model dapat dievaluasi secara konsisten terhadap fenomena attrition.
+### 3. Preprocessing
+**Fitur numerik** diproses melalui **Standardization** menggunakan `StandardScaler` agar seluruh variabel memiliki skala yang sebanding dan tidak mempengaruhi bobot model secara tidak proporsional. Sementara itu, **fitur kategorik** dikodekan menggunakan `One-Hot Encoding` dengan handle_unknown='ignore' untuk mengantisipasi kemunculan kategori baru pada data pengujian tanpa menimbulkan error saat proses prediksi. 
+
+Seluruh proses transformasi ini diintegrasikan dalam sebuah ColumnTransformer sehingga baik scaling maupun encoding dapat diterapkan secara otomatis dan konsisten pada pipeline pemodelan yang digunakan pada tahap analisis berikutnya.
