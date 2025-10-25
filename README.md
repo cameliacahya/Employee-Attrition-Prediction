@@ -229,3 +229,5 @@ Proses pembagian dataset dilakukan menggunakan metode train-test split dengan pr
 **Fitur numerik** diproses melalui **Standardization** menggunakan `StandardScaler` agar seluruh variabel memiliki skala yang sebanding dan tidak mempengaruhi bobot model secara tidak proporsional. Sementara itu, **fitur kategorik** dikodekan menggunakan `One-Hot Encoding` dengan handle_unknown='ignore' untuk mengantisipasi kemunculan kategori baru pada data pengujian tanpa menimbulkan error saat proses prediksi. 
 
 Seluruh proses transformasi ini diintegrasikan dalam sebuah ColumnTransformer sehingga baik scaling maupun encoding dapat diterapkan secara otomatis dan konsisten pada pipeline pemodelan yang digunakan pada tahap analisis berikutnya.
+
+## Model Training, Selection, and Tuning
