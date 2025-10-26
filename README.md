@@ -374,3 +374,33 @@ Ketiga model tersebut menghasilkan prediksi masing-masing, kemudian digabungkan 
 Pendekatan ini memungkinkan model untuk saling melengkapi:
 - Logistic Regression menangkap pola linear
 - SVC dan Gradient Boosting mempelajari pola non-linear dan interaksi fitur
+
+Setelah ketiga model dasar (Logistic Regression, SVC, dan Gradient Boosting) digabungkan dalam arsitektur Stacking Ensemble, model kemudian diuji pada data validasi. Hasil evaluasi menunjukkan bahwa model ini memberikan performa terbaik dibandingkan model individual. Berdasarkan hasil pengujian, diperoleh Accuracy sebesar **0.9521 **dan ROC-AUC sebesar **0.9686**, yang menunjukkan bahwa model memiliki kemampuan sangat baik dalam membedakan karyawan yang akan tetap bekerja dan yang berpotensi keluar.
+
+|                   Kelas | Precision | Recall |  F1-Score  | Support |
+| ----------------------: | :-------: | :----: | :--------: | ------: |
+| **0** (Tidak Attrition) |    0.95   |  0.99  |    0.97    |     262 |
+|       **1** (Attrition) |    0.95   |  0.75  |    0.84    |      51 |
+|            **Accuracy** |           |        | **0.9521** |     313 |
+|           **Macro Avg** |    0.95   |  0.87  |    0.90    |     313 |
+|        **Weighted Avg** |    0.95   |  0.95  |    0.95    |     313 |
+
+Selain itu, dari classification report diketahui bahwa kelas mayoritas (Attrition = 0) memiliki **recall sangat tinggi sebesar 0.99**, menandakan model hampir selalu benar dalam mengidentifikasi karyawan yang bertahan. Pada kelas minoritas (Attrition = 1), model menghasilkan **precision 0.95 dan recall 0.75**, yang menunjukkan bahwa meskipun kasus resign lebih sulit diprediksi karena ketidakseimbangan data, model tetap cukup efektif mendeteksinya. Nilai **macro average F1-score sebesar 0.90** dan **weighted average F1-score sebesar 0.95** semakin menegaskan bahwa pendekatan stacking mampu mengatasi tantangan imbalance dan memberikan generalisasi yang baik.
+
+## Model Testing and Evaluation
+Setelah dilakukan pelatihan dan validasi model, model terbaik yaitu **Stacking Ensemble** diaplikasikan pada data test untuk menghasilkan prediksi risiko attrition setiap karyawan. Karena data test tidak memiliki label sebenarnya (y_test), maka evaluasi performa hanya mengacu pada hasil validasi. Output pada tahap ini berupa probabilitas terjadinya attrition pada tiap observasi di test set, yang kemudian disimpan sebagai file submission untuk keperluan analisis lanjutan atau penilaian eksternal.
+
+## Interpretasi 
+Misal untuk 5 data pertama :
+| id    | Attrition    |
+|-------|--------------|
+| CM617	| 0.137938663  |
+| PJ010	| 0.030281862  |
+| GJ831	| 0.151824062  |
+| JD352	| 0.032564569  |
+| :    	| :            |
+| MQ920	| 0.031431933  |
+	
+Hasil prediksi pada data test disajikan dalam bentuk probabilitas Attrition untuk setiap karyawan, yang menunjukkan seberapa besar kemungkinan individu tersebut akan keluar dari perusahaan. Nilai ini berada pada rentang 0 hingga 1, di mana semakin mendekati 1 berarti risiko karyawan untuk resign semakin tinggi. Misalnya, seorang karyawan dengan probabilitas 0.15 memiliki peluang sekitar 15% untuk keluar dari perusahaan, sementara nilai sangat kecil seperti 0.03 menunjukkan kemungkinan yang sangat rendah untuk attrition.
+
+Karena data test tidak memiliki label sebenarnya, hasil prediksi ini sepenuhnya menggambarkan estimasi risiko berdasarkan pola yang telah dipelajari model dari data training. Probabilitas tersebut dapat digunakan oleh perusahaan sebagai dasar pengambilan keputusan strategis, seperti menentukan prioritas dalam program retensi atau memberikan perhatian khusus pada karyawan dengan tingkat risiko yang lebih tinggi. Apabila diperlukan klasifikasi biner (keluar atau tidak), maka nilai probabilitas dapat dikonversi menjadi label dengan menetapkan threshold tertentu, misalnya 0.30, sehingga karyawan dengan probabilitas di atas ambang tersebut dikategorikan berpotensi tinggi untuk keluar.
