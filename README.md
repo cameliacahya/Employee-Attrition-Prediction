@@ -390,6 +390,11 @@ Selain itu, dari classification report diketahui bahwa kelas mayoritas (Attritio
 ## Model Testing and Evaluation
 Setelah dilakukan pelatihan dan validasi model, model terbaik yaitu **Stacking Ensemble** diaplikasikan pada data test untuk menghasilkan prediksi risiko attrition setiap karyawan. Karena data test tidak memiliki label sebenarnya (y_test), maka evaluasi performa hanya mengacu pada hasil validasi. Output pada tahap ini berupa probabilitas terjadinya attrition pada tiap observasi di test set, yang kemudian disimpan sebagai file submission untuk keperluan analisis lanjutan atau penilaian eksternal.
 
+```python
+pred = stack_model.predict(X_test)
+pred_prob = stack_model.predict_proba(X_test)[:,1]
+```
+
 ## Interpretasi 
 Hasil prediksi pada data test disajikan dalam bentuk probabilitas Attrition untuk setiap karyawan, yang menunjukkan seberapa besar kemungkinan individu tersebut akan keluar dari perusahaan. Nilai ini berada pada rentang 0 hingga 1, di mana semakin mendekati 1 berarti risiko karyawan untuk resign semakin tinggi. Misalnya, seorang karyawan dengan probabilitas 0.15 memiliki peluang sekitar 15% untuk keluar dari perusahaan, sementara nilai sangat kecil seperti 0.03 menunjukkan kemungkinan yang sangat rendah untuk attrition.
 
