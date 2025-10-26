@@ -375,7 +375,7 @@ Pendekatan ini memungkinkan model untuk saling melengkapi:
 - Logistic Regression menangkap pola linear
 - SVC dan Gradient Boosting mempelajari pola non-linear dan interaksi fitur
 
-Setelah ketiga model dasar (Logistic Regression, SVC, dan Gradient Boosting) digabungkan dalam arsitektur Stacking Ensemble, model kemudian diuji pada data validasi. Hasil evaluasi menunjukkan bahwa model ini memberikan performa terbaik dibandingkan model individual. Berdasarkan hasil pengujian, diperoleh Accuracy sebesar **0.9521 **dan ROC-AUC sebesar **0.9686**, yang menunjukkan bahwa model memiliki kemampuan sangat baik dalam membedakan karyawan yang akan tetap bekerja dan yang berpotensi keluar.
+Setelah ketiga model dasar (Logistic Regression, SVC, dan Gradient Boosting) digabungkan dalam arsitektur Stacking Ensemble, model kemudian diuji pada data validasi. Hasil evaluasi menunjukkan bahwa model ini memberikan performa terbaik dibandingkan model individual. Berdasarkan hasil pengujian, diperoleh Accuracy sebesar **0.9521** dan ROC-AUC sebesar **0.9686**, yang menunjukkan bahwa model memiliki kemampuan sangat baik dalam membedakan karyawan yang akan tetap bekerja dan yang berpotensi keluar.
 
 |                   Kelas | Precision | Recall |  F1-Score  | Support |
 | ----------------------: | :-------: | :----: | :--------: | ------: |
